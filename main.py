@@ -1,4 +1,5 @@
 import pathlib
+from analyzer.hashing import calcular_hash
 total_files = 0
 print("=== PYTHON FILE SECURITY ANALYZER ===")
 file_path = input("Informe o caminho do diretório: ")
@@ -12,6 +13,7 @@ if directory.is_dir():
             print(f'    extensão: {item.suffix}')
             print(f'    tamanho: {item.stat().st_size} bytes')
             print(f'    caminho: {item.resolve()}')
+            print(f'    hash SHA-256: {calcular_hash(item)}')
             print('-'*40)
             total_files += 1
     print(f'[+] Total de arquivos encontrados: {total_files}')
