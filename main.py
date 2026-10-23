@@ -4,55 +4,73 @@ from analyzer.rules import verificar_extensao
 from analyzer.hashing import calcular_hash
 from analyzer.reporting import gerar_relatorio
 
-total_files = 0
-resultados = []
 
-print("=== PYTHON FILE SECURITY ANALYZER ===")
+def main():
 
-file_path = input("Informe o caminho do diretório: ")
-directory = pathlib.Path(file_path)
+    total_files = 0
+    resultados = []
 
-if directory.is_dir():
-    print('\n[+] Diretório encontrado!')
-    print('Arquivos encontrados:')
+    print("=== PYTHON FILE SECURITY ANALYZER ===")
 
-    for item in directory.iterdir():
+    file_path = input("Informe o caminho do diretório: ")
+    directory = pathlib.Path(file_path)
 
-        if item.is_file() and item.name != '.gitkeep':
+    if directory.is_dir():
 
-            print(f'  - {item.name}')
-            print(f'    extensão: {item.suffix}')
-            print(f'    tamanho: {item.stat().st_size} bytes')
-            print(f'    caminho: {item.relative_to(directory)}')
+        print('\n[+] Diretório encontrado!')
+        print('Arquivos encontrados:')
 
-            hash_arquivo = calcular_hash(item)
-            print(f'    hash SHA-256: {hash_arquivo}')
+        for item in directory.iterdir():
 
-            resultado_suspeito = verificar_extensao(item)
+            if item.is_file() and item.name != '.gitkeep':
 
-            if resultado_suspeito:
-                print('[!] Indicador suspeito: possível dupla extensão.')
-            else:
-                print('[i] Nenhum indicador identificado pela regra atual.')
+                try:
+                    hash_arquivo = calcular_hash(item)
 
-            resultado_arquivo = {
-                "nome": item.name,
-                "extensao": item.suffix,
-                "tamanho": item.stat().st_size,
-                "caminho": str(item.relative_to(directory)),
-                "sha256": hash_arquivo,
-                "suspeito": resultado_suspeito
-            }
+                    print(f'  - {item.name}')
+                    print(f'    extensão: {item.suffix}')
+                    print(f'    tamanho: {item.stat().st_size} bytes')
+                    print(f'    caminho: {item.relative_to(directory)}')
+                    print(f'    hash SHA-256: {hash_arquivo}')
 
-            resultados.append(resultado_arquivo)
-            total_files += 1
-            print("-" * 45)
+                    resultado_suspeito = verificar_extensao(item)
 
-    caminho_relatorio = gerar_relatorio(resultados)
+                    if resultado_suspeito:
+                        print('[!] Indicador suspeito: possível dupla extensão.')
+                    else:
+                        print('[i] Nenhum indicador identificado pela regra atual.')
 
-    print(f"\n[+] Total de arquivos analisados: {total_files}")
-    print("[+] Relatório gerado com sucesso!")
-    print(f"[+] Local: {caminho_relatorio}")
+                    resultado_arquivo = {
+                        "nome": item.name,
+                        "extensao": item.suffix,
+                        "tamanho": item.stat().st_size,
+                        "caminho": str(item.relative_to(directory)),
+                        "sha256": hash_arquivo,
+                        "suspeito": resultado_suspeito
+                    }
 
-else:
-    print("[-] Diretório não encontrado!")
+                    resultados.append(resultado_arquivo)
+                    total_files += 1
+
+                    print("-" * 45)
+
+                except PermissionError:
+                    print(f'[-] Permissão negada para acessar: {item.name}')
+                    continue
+
+                except OSError as error:
+                    print(f'[-] Erro ao analisar {item.name}: {error}')
+                    continue
+
+        caminho_relatorio = gerar_relatorio(resultados)
+
+        print(f"\n[+] Total de arquivos analisados: {total_files}")
+        print("[+] Relatório gerado com sucesso!")
+        print(f"[+] Local: {caminho_relatorio}")
+
+    else:
+        print("[-] Diretório não encontrado!")
+
+
+if __name__ == "__main__":
+    main()
