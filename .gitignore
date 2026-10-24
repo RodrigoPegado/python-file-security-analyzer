@@ -1,11 +1,28 @@
+
+# Python - arquivos temporários
 __pycache__/
 *.py[cod]
 *$py.class
-.pytest_cache/
+
+# Ambientes virtuais
 .venv/
 venv/
 env/
-ENV/
+
+# Arquivos de configuração local
 .env
+.env.*
+
+# Arquivos temporários do editor e sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Relatórios gerados automaticamente
 reports/*
 !reports/.gitkeep
+
+# Arquivos de experimentação local
+samples/*
+!samples/.gitkeep
